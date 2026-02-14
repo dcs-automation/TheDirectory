@@ -1,0 +1,14 @@
+[Unit]
+Description=TheDirectory Homepage Server
+After=network.target
+
+[Service]
+Type=simple
+User=dan
+WorkingDirectory=/home/dan/TheDirectory
+ExecStart=/usr/bin/python3 /home/dan/TheDirectory/server.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
