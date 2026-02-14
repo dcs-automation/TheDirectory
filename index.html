@@ -206,6 +206,14 @@
 
     .link-tile:hover .tile-delete { display: flex; }
 
+    .link-tile.dragging { opacity: 0.3; }
+
+    .links-grid.drag-over {
+      outline: 2px dashed var(--accent);
+      outline-offset: 4px;
+      border-radius: var(--radius);
+    }
+
     /* ── Add-category button ── */
     .add-category-btn {
       display: inline-flex;
@@ -238,6 +246,7 @@
 
     .side-box--left { left: 24px; height: 360px; }
     .side-box--right { right: 24px; background: var(--bg); border: none; }
+    .side-box--right .side-box-header { justify-content: center; border-bottom: none; }
 
     .side-box-header {
       display: flex;
@@ -588,12 +597,39 @@
         // Links grid
         const grid = document.createElement("div");
         grid.className = "links-grid";
+        grid.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          grid.classList.add("drag-over");
+        });
+        grid.addEventListener("dragleave", () => {
+          grid.classList.remove("drag-over");
+        });
+        grid.addEventListener("drop", (e) => {
+          e.preventDefault();
+          grid.classList.remove("drag-over");
+          try {
+            const src = JSON.parse(e.dataTransfer.getData("text/plain"));
+            if (src.ci === ci) return;
+            const [moved] = data[src.ci].links.splice(src.li, 1);
+            data[ci].links.push(moved);
+            save(data);
+            render();
+          } catch {}
+        });
 
         cat.links.forEach((link, li) => {
           const tile = document.createElement("a");
           tile.className = "link-tile";
           tile.href = link.url;
           tile.title = link.url;
+          tile.draggable = true;
+          tile.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", JSON.stringify({ ci, li }));
+            tile.classList.add("dragging");
+          });
+          tile.addEventListener("dragend", () => {
+            tile.classList.remove("dragging");
+          });
 
           const img = document.createElement("img");
           img.className = "favicon";
