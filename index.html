@@ -204,6 +204,26 @@
       justify-content: center;
     }
 
+    .link-tile .tile-edit {
+      position: absolute;
+      top: 4px;
+      right: 24px;
+      background: var(--surface-hover);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .link-tile .tile-edit:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .link-tile:hover .tile-edit { display: flex; }
     .link-tile:hover .tile-delete { display: flex; }
 
     .link-tile.dragging { opacity: 0.3; }
@@ -213,6 +233,9 @@
       outline-offset: 4px;
       border-radius: var(--radius);
     }
+
+    .link-tile.drop-before { box-shadow: -3px 0 0 0 var(--accent); }
+    .link-tile.drop-after { box-shadow: 3px 0 0 0 var(--accent); }
 
     /* ── Add-category button ── */
     .add-category-btn {
@@ -411,6 +434,105 @@
     }
 
     .btn-primary:hover { background: var(--accent-hover); }
+
+    /* ── Mobile ── */
+    @media (max-width: 1200px) {
+      .side-box--left, .side-box--right { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 28px 16px 0; }
+      .clock { font-size: 2.5rem; letter-spacing: 2px; }
+      .date { font-size: 0.85rem; }
+      .search-wrap { margin-top: 20px; }
+      .search-input { padding: 10px 14px 10px 40px; font-size: 0.9rem; }
+      .main { padding: 24px 16px 60px; }
+      .category { margin-bottom: 24px; }
+      .links-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+      .link-tile { padding: 10px 12px; gap: 8px; }
+      .link-tile .link-label { font-size: 0.8rem; }
+      .category-actions { opacity: 1; }
+      .link-tile .tile-delete, .link-tile .tile-edit { display: flex; }
+      .modal { padding: 20px; }
+    }
+
+    /* ── Hamburger / mobile panels ── */
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      z-index: 50;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mobile-toggle svg { width: 20px; height: 20px; }
+    .mobile-toggle:hover { background: var(--surface-hover); color: var(--text); }
+
+    .mobile-toggle--notes { left: 16px; }
+    .mobile-toggle--calendar { right: 16px; }
+
+    .mobile-panel {
+      display: none;
+      position: fixed;
+      bottom: 70px;
+      z-index: 50;
+      width: calc(100% - 32px);
+      max-width: 320px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-height: 50vh;
+      overflow: auto;
+    }
+
+    .mobile-panel--notes { left: 16px; }
+    .mobile-panel--calendar { right: 16px; }
+
+    .mobile-panel .side-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-panel .side-box-header span {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .mobile-panel .notepad-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+    }
+
+    .mobile-panel .calendar { padding: 14px; }
+
+    .mobile-panel.open { display: block; }
+
+    @media (max-width: 1200px) {
+      .mobile-toggle { display: flex; }
+    }
   </style>
 </head>
 <body>
@@ -443,6 +565,29 @@
       <span id="calendarMonth"></span>
     </div>
     <div class="calendar" id="calendar"></div>
+  </div>
+
+  <!-- Mobile toggles -->
+  <button class="mobile-toggle mobile-toggle--notes" id="mobileNotesToggle" title="Notes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </button>
+  <button class="mobile-toggle mobile-toggle--calendar" id="mobileCalendarToggle" title="Calendar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  </button>
+
+  <!-- Mobile panels -->
+  <div class="mobile-panel mobile-panel--notes" id="mobileNotesPanel">
+    <div class="side-box-header">
+      <span>Notes</span>
+      <span class="notepad-status" id="mobileNotepadStatus"></span>
+    </div>
+    <textarea class="notepad-textarea" id="mobileNotepadText" placeholder="Write your notes here..."></textarea>
+  </div>
+  <div class="mobile-panel mobile-panel--calendar" id="mobileCalendarPanel">
+    <div class="side-box-header" style="justify-content:center; border-bottom:none;">
+      <span id="mobileCalendarMonth"></span>
+    </div>
+    <div class="calendar" id="mobileCalendar"></div>
   </div>
 
   <!-- Modal -->
@@ -543,6 +688,13 @@
       }
     }
 
+    // ── Helpers ──
+    function clearDropIndicators(grid) {
+      grid.querySelectorAll(".drop-before, .drop-after").forEach(el => {
+        el.classList.remove("drop-before", "drop-after");
+      });
+    }
+
     // ── Render ──
     function render() {
       const main = document.getElementById("main");
@@ -599,17 +751,19 @@
         grid.className = "links-grid";
         grid.addEventListener("dragover", (e) => {
           e.preventDefault();
-          grid.classList.add("drag-over");
+          // Only show grid-level highlight if dragging over the grid background (not a tile)
+          if (e.target === grid) grid.classList.add("drag-over");
         });
-        grid.addEventListener("dragleave", () => {
-          grid.classList.remove("drag-over");
+        grid.addEventListener("dragleave", (e) => {
+          if (e.target === grid) grid.classList.remove("drag-over");
         });
         grid.addEventListener("drop", (e) => {
           e.preventDefault();
           grid.classList.remove("drag-over");
+          clearDropIndicators(grid);
           try {
             const src = JSON.parse(e.dataTransfer.getData("text/plain"));
-            if (src.ci === ci) return;
+            if (src.ci === ci) return; // dropped on grid bg within same category — no-op
             const [moved] = data[src.ci].links.splice(src.li, 1);
             data[ci].links.push(moved);
             save(data);
@@ -629,6 +783,53 @@
           });
           tile.addEventListener("dragend", () => {
             tile.classList.remove("dragging");
+            document.querySelectorAll(".drop-before, .drop-after").forEach(el => {
+              el.classList.remove("drop-before", "drop-after");
+            });
+          });
+
+          // Per-tile drag-over for reorder indicator
+          tile.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            grid.classList.remove("drag-over");
+            clearDropIndicators(grid);
+            const rect = tile.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            if (e.clientX < midX) {
+              tile.classList.add("drop-before");
+              tile.classList.remove("drop-after");
+            } else {
+              tile.classList.add("drop-after");
+              tile.classList.remove("drop-before");
+            }
+          });
+          tile.addEventListener("dragleave", () => {
+            tile.classList.remove("drop-before", "drop-after");
+          });
+          tile.addEventListener("drop", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            grid.classList.remove("drag-over");
+            clearDropIndicators(grid);
+            try {
+              const src = JSON.parse(e.dataTransfer.getData("text/plain"));
+              const rect = tile.getBoundingClientRect();
+              const midX = rect.left + rect.width / 2;
+              const insertAfter = e.clientX >= midX;
+
+              // Remove from source
+              const [moved] = data[src.ci].links.splice(src.li, 1);
+
+              // Calculate target index (account for removal shifting indices)
+              let targetIdx = li;
+              if (src.ci === ci && src.li < li) targetIdx--;
+              if (insertAfter) targetIdx++;
+
+              data[ci].links.splice(targetIdx, 0, moved);
+              save(data);
+              render();
+            } catch {}
           });
 
           const img = document.createElement("img");
@@ -642,6 +843,16 @@
           lbl.className = "link-label";
           lbl.textContent = link.label;
 
+          const editBtn = document.createElement("button");
+          editBtn.className = "tile-edit";
+          editBtn.innerHTML = `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+          editBtn.title = "Edit";
+          editBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openEditLinkModal(ci, li);
+          });
+
           const del = document.createElement("button");
           del.className = "tile-delete";
           del.innerHTML = "&times;";
@@ -654,7 +865,7 @@
             render();
           });
 
-          tile.append(img, lbl, del);
+          tile.append(img, lbl, editBtn, del);
           grid.appendChild(tile);
         });
 
@@ -738,6 +949,25 @@
       });
     }
 
+    function openEditLinkModal(ci, li) {
+      const link = data[ci].links[li];
+      openModal("Edit Link", `
+        <label for="mLabel">Name</label>
+        <input type="text" id="mLabel" value="${link.label.replace(/"/g, '&quot;')}">
+        <label for="mUrl">URL</label>
+        <input type="url" id="mUrl" value="${link.url.replace(/"/g, '&quot;')}">
+      `, () => {
+        const label = document.getElementById("mLabel").value.trim();
+        const url = document.getElementById("mUrl").value.trim();
+        if (!label || !url) return;
+        const fullUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+        data[ci].links[li] = { label, url: fullUrl };
+        save(data);
+        render();
+        closeModal();
+      });
+    }
+
     function openRenameCategoryModal(ci) {
       openModal("Rename Category", `
         <label for="mCat">Category Name</label>
@@ -760,7 +990,7 @@
     // Load notes from server
     fetch("/api/notes")
       .then(r => r.json())
-      .then(d => { notepadText.value = d.content || ""; })
+      .then(d => { notepadText.value = d.content || ""; mobileNotepadText.value = d.content || ""; })
       .catch(() => {});
 
     // Auto-save on typing with debounce
@@ -806,6 +1036,71 @@
       document.getElementById("calendar").innerHTML = html;
     }
     renderCalendar();
+
+    // ── Mobile panels ──
+    const mobileNotesToggle = document.getElementById("mobileNotesToggle");
+    const mobileCalendarToggle = document.getElementById("mobileCalendarToggle");
+    const mobileNotesPanel = document.getElementById("mobileNotesPanel");
+    const mobileCalendarPanel = document.getElementById("mobileCalendarPanel");
+    const mobileNotepadText = document.getElementById("mobileNotepadText");
+    const mobileNotepadStatus = document.getElementById("mobileNotepadStatus");
+    let mobileSaveTimer = null;
+
+    mobileNotesToggle.addEventListener("click", () => {
+      mobileCalendarPanel.classList.remove("open");
+      mobileNotesPanel.classList.toggle("open");
+      if (mobileNotesPanel.classList.contains("open")) {
+        mobileNotepadText.value = notepadText.value;
+      }
+    });
+
+    mobileCalendarToggle.addEventListener("click", () => {
+      mobileNotesPanel.classList.remove("open");
+      mobileCalendarPanel.classList.toggle("open");
+    });
+
+    // Sync mobile notepad to desktop and save
+    mobileNotepadText.addEventListener("input", () => {
+      notepadText.value = mobileNotepadText.value;
+      mobileNotepadStatus.textContent = "";
+      clearTimeout(mobileSaveTimer);
+      mobileSaveTimer = setTimeout(() => {
+        fetch("/api/notes", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: mobileNotepadText.value })
+        })
+          .then(() => {
+            mobileNotepadStatus.textContent = "Saved";
+            setTimeout(() => { mobileNotepadStatus.textContent = ""; }, 2000);
+          })
+          .catch(() => { mobileNotepadStatus.textContent = "Save failed"; });
+      }, 500);
+    });
+
+    // Sync desktop notepad changes to mobile
+    notepadText.addEventListener("input", () => {
+      mobileNotepadText.value = notepadText.value;
+    });
+
+    function renderMobileCalendar() {
+      const now = new Date();
+      document.getElementById("mobileCalendarMonth").textContent =
+        now.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+      document.getElementById("mobileCalendar").innerHTML =
+        document.getElementById("calendar").innerHTML;
+    }
+    renderMobileCalendar();
+
+    // Close mobile panels when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!mobileNotesPanel.contains(e.target) && !mobileNotesToggle.contains(e.target)) {
+        mobileNotesPanel.classList.remove("open");
+      }
+      if (!mobileCalendarPanel.contains(e.target) && !mobileCalendarToggle.contains(e.target)) {
+        mobileCalendarPanel.classList.remove("open");
+      }
+    });
 
     // ── Init ──
     render();
