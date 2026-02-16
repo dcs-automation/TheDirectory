@@ -43,6 +43,14 @@ Copy each namespace ID into `wrangler.toml` under the matching `[[kv_namespaces]
 
 ### Deploy
 
+If you have a `.env` file with `CLOUDFLARE_API_TOKEN` set:
+
+```bash
+source .env && npx wrangler pages deploy ./public --project-name=thedirectory
+```
+
+Or pass the token directly:
+
 ```bash
 CLOUDFLARE_API_TOKEN=<your-token> npx wrangler pages deploy ./public --project-name=thedirectory
 ```
