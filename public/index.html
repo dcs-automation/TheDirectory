@@ -294,8 +294,7 @@
       flex-shrink: 0;
     }
 
-    .side-panel--notes { height: 200px; }
-    .side-panel--lists { min-height: 280px; flex: 1; }
+    .side-panel--notes { flex: 1; }
     .side-box--right { right: 24px; background: var(--bg); border: none; }
     .side-box--right .side-box-header { justify-content: center; border-bottom: none; }
 
@@ -341,8 +340,22 @@
 
     .notepad-textarea::placeholder { color: var(--text-muted); }
 
-    /* ── Lists widget ── */
-    .lists-header {
+    /* ── Lists widget (center card) ── */
+    .lists-widget {
+      width: 100%;
+      max-width: 560px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+    }
+
+    .lists-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .lists-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -351,33 +364,23 @@
       position: relative;
     }
 
-    .lists-header-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      min-width: 0;
-    }
-
-    .lists-header-left:hover { color: var(--accent); }
-
-    .lists-name {
+    .lists-select {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
       font-size: 0.8rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 2px;
-      color: var(--text-muted);
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      cursor: pointer;
+      outline: none;
+      font-family: inherit;
+      max-width: 70%;
     }
 
-    .lists-header-left:hover .lists-name { color: var(--accent); }
-
-    .lists-arrow {
-      font-size: 0.6rem;
-      color: var(--text-muted);
-      transition: transform .2s;
+    .lists-select option {
+      background: var(--surface);
+      color: var(--text);
     }
 
     .lists-menu-btn {
@@ -393,11 +396,10 @@
 
     .lists-menu-btn:hover { background: var(--surface-hover); color: var(--text); }
 
-    .lists-dropdown,
     .lists-context-menu {
       position: absolute;
       top: 100%;
-      left: 0;
+      right: 0;
       z-index: 60;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -407,9 +409,6 @@
       box-shadow: 0 8px 24px rgba(0,0,0,.4);
     }
 
-    .lists-context-menu { left: auto; right: 0; }
-
-    .lists-dropdown button,
     .lists-context-menu button {
       display: flex;
       align-items: center;
@@ -424,32 +423,27 @@
       text-align: left;
     }
 
-    .lists-dropdown button:hover,
     .lists-context-menu button:hover { background: var(--surface-hover); }
     .lists-context-menu button.danger { color: var(--danger); }
     .lists-context-menu button.danger:hover { background: rgba(213,91,91,.15); }
 
-    .lists-dropdown button.active {
-      color: var(--accent);
-      font-weight: 600;
+    .lists-tasks,
+    .lists-completed {
+      padding: 0;
     }
 
-    .lists-items {
-      flex: 1;
-      overflow-y: auto;
-      padding: 6px 0;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
+    .lists-empty {
+      padding: 20px 14px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.83rem;
     }
-
-    .lists-items::-webkit-scrollbar { width: 4px; }
-    .lists-items::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .list-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
-      padding: 5px 14px;
+      padding: 6px 14px;
       cursor: default;
       position: relative;
     }
@@ -466,6 +460,7 @@
       cursor: pointer;
       flex-shrink: 0;
       position: relative;
+      margin-top: 2px;
     }
 
     .list-item input[type="checkbox"]:checked {
@@ -490,11 +485,13 @@
       font-size: 0.83rem;
       color: var(--text);
       min-width: 0;
-      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
       cursor: text;
-      padding: 2px 0;
+      padding: 1px 0;
+      line-height: 1.4;
     }
 
     .list-item-text.done {
@@ -504,43 +501,102 @@
 
     .list-item-text:focus {
       outline: none;
-      white-space: normal;
+      -webkit-line-clamp: unset;
       overflow: visible;
     }
 
-    .list-item .item-delete {
+    .list-item .item-menu-btn {
       display: none;
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 0.9rem;
-      padding: 0 2px;
+      font-size: 1rem;
+      padding: 0 4px;
       flex-shrink: 0;
       line-height: 1;
+      border-radius: 4px;
     }
 
-    .list-item:hover .item-delete { display: block; }
-    .list-item .item-delete:hover { color: var(--danger); }
+    .list-item:hover .item-menu-btn { display: block; }
+    .list-item .item-menu-btn:hover { background: var(--surface); color: var(--text); }
 
-    .list-item.drag-over-above { box-shadow: 0 -2px 0 0 var(--accent) inset; }
-    .list-item.drag-over-below { box-shadow: 0 2px 0 0 var(--accent) inset; }
+    .item-context-menu {
+      position: fixed;
+      z-index: 200;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 0;
+      min-width: 140px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
 
-    .lists-add-btn {
+    .item-context-menu button {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       width: 100%;
       padding: 8px 14px;
       background: none;
       border: none;
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
+      color: var(--text);
       font-size: 0.82rem;
       cursor: pointer;
+      text-align: left;
     }
 
-    .lists-add-btn:hover { color: var(--text); background: var(--surface-hover); }
+    .item-context-menu button:hover { background: var(--surface-hover); }
+    .item-context-menu button.danger { color: var(--danger); }
+    .item-context-menu button.danger:hover { background: rgba(213,91,91,.15); }
+
+    .list-item.dragging { opacity: 0.3; }
+    .list-item.drag-over-above { box-shadow: 0 -2px 0 0 var(--accent) inset; }
+    .list-item.drag-over-below { box-shadow: 0 2px 0 0 var(--accent) inset; }
+
+    .lists-completed-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      user-select: none;
+    }
+
+    .lists-completed-toggle:hover { background: var(--surface-hover); }
+
+    .lists-completed-arrow {
+      font-size: 0.55rem;
+      transition: transform .2s;
+      display: inline-block;
+    }
+
+    .lists-completed-arrow.open { transform: rotate(90deg); }
+
+    .lists-input-wrap {
+      border-top: 1px solid var(--border);
+      padding: 0;
+    }
+
+    .lists-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.83rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .lists-input::placeholder { color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      .lists-widget { padding: 0 16px; margin-top: 16px; }
+    }
 
     /* ── Calendar ── */
     .calendar {
@@ -776,31 +832,36 @@
     </div>
   </div>
 
+  <!-- Lists widget -->
+  <div class="lists-widget" id="listsWidget">
+    <div class="lists-card">
+      <div class="lists-toolbar">
+        <select class="lists-select" id="listsSelect"></select>
+        <button class="lists-menu-btn" id="listsMenuBtn">&#8942;</button>
+      </div>
+      <div class="lists-tasks" id="listsTasks"></div>
+      <div class="lists-completed-toggle" id="listsCompletedToggle" style="display:none;">
+        <span class="lists-completed-arrow">&#9654;</span>
+        <span>Completed (<span id="listsCompletedCount">0</span>)</span>
+      </div>
+      <div class="lists-completed" id="listsCompleted"></div>
+      <div class="lists-input-wrap">
+        <input type="text" class="lists-input" id="listsInput" placeholder="+ Add an item">
+      </div>
+    </div>
+  </div>
+
   <!-- Links -->
   <div class="main" id="main"></div>
 
-  <!-- Left sidebar: Notes + Lists -->
+  <!-- Left sidebar: Notes -->
   <div class="side-box side-box--left">
-    <!-- Notes panel -->
     <div class="side-panel side-panel--notes">
       <div class="side-box-header">
         <span>Notes</span>
         <span class="notepad-status" id="notepadStatus"></span>
       </div>
       <textarea class="notepad-textarea" id="notepadText" placeholder="Write your notes here..."></textarea>
-    </div>
-
-    <!-- Lists panel -->
-    <div class="side-panel side-panel--lists" id="listsPanel">
-      <div class="lists-header">
-        <div class="lists-header-left" id="listsHeaderLeft">
-          <span class="lists-name" id="listsName">Lists</span>
-          <span class="lists-arrow">&#9662;</span>
-        </div>
-        <button class="lists-menu-btn" id="listsMenuBtn" title="List options">&#8942;</button>
-      </div>
-      <div class="lists-items" id="listsItems"></div>
-      <button class="lists-add-btn" id="listsAddBtn">+ Add an item</button>
     </div>
   </div>
 
@@ -1329,13 +1390,19 @@
     let listsData = [];
     let currentListIdx = 0;
     let listsSaveTimer = null;
+    let completedOpen = false;
+    let activeListMenu = null;
+    let activeItemMenu = null;
 
-    const listsName = document.getElementById("listsName");
-    const listsItems = document.getElementById("listsItems");
-    const listsAddBtn = document.getElementById("listsAddBtn");
-    const listsHeaderLeft = document.getElementById("listsHeaderLeft");
-    const listsMenuBtn = document.getElementById("listsMenuBtn");
-    const listsPanel = document.getElementById("listsPanel");
+    const listsSelect = document.getElementById("listsSelect");
+    const listsTasks = document.getElementById("listsTasks");
+    const listsCompleted = document.getElementById("listsCompleted");
+    const listsCompletedToggle = document.getElementById("listsCompletedToggle");
+    const listsCompletedCount = document.getElementById("listsCompletedCount");
+    const listsCompletedArrow = document.querySelector(".lists-completed-arrow");
+    const listsInput = document.getElementById("listsInput");
+    const listsMenuBtn2 = document.getElementById("listsMenuBtn");
+    const listsToolbar = document.querySelector(".lists-toolbar");
 
     function genId() {
       return Math.random().toString(36).slice(2, 10);
@@ -1352,42 +1419,55 @@
       }, 400);
     }
 
-    function renderLists() {
-      // Close any open dropdowns
-      closeListsDropdowns();
+    function closeListMenus() {
+      if (activeListMenu) { activeListMenu.remove(); activeListMenu = null; }
+      if (activeItemMenu) { activeItemMenu.remove(); activeItemMenu = null; }
+    }
 
+    function populateSelect() {
+      listsSelect.innerHTML = "";
       if (listsData.length === 0) {
-        listsName.textContent = "Lists";
-        listsItems.innerHTML = '<div style="padding: 14px; color: var(--text-muted); font-size: 0.82rem;">No lists yet. Click ⋮ to create one.</div>';
-        listsAddBtn.style.display = "none";
+        const opt = document.createElement("option");
+        opt.textContent = "Lists";
+        opt.disabled = true;
+        listsSelect.appendChild(opt);
         return;
       }
+      listsData.forEach((list, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = list.name;
+        if (i === currentListIdx) opt.selected = true;
+        listsSelect.appendChild(opt);
+      });
+    }
 
-      if (currentListIdx >= listsData.length) currentListIdx = listsData.length - 1;
-      const list = listsData[currentListIdx];
-      listsName.textContent = list.name;
-      listsAddBtn.style.display = "";
+    listsSelect.addEventListener("change", () => {
+      currentListIdx = parseInt(listsSelect.value, 10);
+      renderLists();
+    });
 
-      listsItems.innerHTML = "";
-      list.items.forEach((item, idx) => {
-        const row = document.createElement("div");
-        row.className = "list-item";
+    function buildItem(item, idx, list, container, isDone) {
+      const row = document.createElement("div");
+      row.className = "list-item";
+
+      // Only active items are draggable
+      if (!isDone) {
         row.draggable = true;
-
         row.addEventListener("dragstart", (e) => {
           e.dataTransfer.setData("text/plain", JSON.stringify({ type: "list-item", idx }));
-          row.style.opacity = "0.3";
+          row.classList.add("dragging");
         });
         row.addEventListener("dragend", () => {
-          row.style.opacity = "";
-          listsItems.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
+          row.classList.remove("dragging");
+          container.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
             el.classList.remove("drag-over-above", "drag-over-below");
           });
         });
         row.addEventListener("dragover", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          listsItems.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
+          container.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
             el.classList.remove("drag-over-above", "drag-over-below");
           });
           const rect = row.getBoundingClientRect();
@@ -1408,128 +1488,249 @@
           try {
             const src = JSON.parse(e.dataTransfer.getData("text/plain"));
             if (src.type !== "list-item") return;
+            // Get active items only
+            const activeItems = list.items.filter(it => !it.done);
+            const srcActiveIdx = src.idx;
+            const tgtActiveIdx = idx;
             const rect = row.getBoundingClientRect();
             const midY = rect.top + rect.height / 2;
             const insertAfter = e.clientY >= midY;
-            const [moved] = list.items.splice(src.idx, 1);
-            let targetIdx = idx;
-            if (src.idx < idx) targetIdx--;
-            if (insertAfter) targetIdx++;
-            list.items.splice(targetIdx, 0, moved);
+
+            // Map active indices back to real indices
+            let realActiveIndices = [];
+            list.items.forEach((it, ri) => { if (!it.done) realActiveIndices.push(ri); });
+            const srcRealIdx = realActiveIndices[srcActiveIdx];
+            const tgtRealIdx = realActiveIndices[tgtActiveIdx];
+
+            const [moved] = list.items.splice(srcRealIdx, 1);
+            // Recalculate target after removal
+            let newRealIndices = [];
+            list.items.forEach((it, ri) => { if (!it.done) newRealIndices.push(ri); });
+            // Find where the target ended up
+            let insertIdx;
+            if (newRealIndices.length === 0) {
+              insertIdx = 0;
+            } else {
+              const adjustedTgtActive = tgtActiveIdx > srcActiveIdx ? tgtActiveIdx - 1 : tgtActiveIdx;
+              if (adjustedTgtActive >= newRealIndices.length) {
+                insertIdx = list.items.length;
+              } else {
+                insertIdx = newRealIndices[adjustedTgtActive];
+                if (insertAfter) insertIdx++;
+              }
+            }
+            list.items.splice(insertIdx, 0, moved);
             saveLists();
             renderLists();
           } catch {}
         });
+      }
 
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = item.done;
-        cb.addEventListener("change", () => {
-          item.done = cb.checked;
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = item.done;
+      cb.addEventListener("change", () => {
+        item.done = cb.checked;
+        saveLists();
+        renderLists();
+      });
+
+      const text = document.createElement("span");
+      text.className = "list-item-text" + (item.done ? " done" : "");
+      text.textContent = item.text;
+      text.contentEditable = "true";
+      text.spellcheck = false;
+      text.addEventListener("focus", () => {
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+      text.addEventListener("blur", () => {
+        const newText = text.textContent.trim();
+        if (newText && newText !== item.text) {
+          item.text = newText;
+          saveLists();
+        } else if (!newText) {
+          const realIdx = list.items.indexOf(item);
+          if (realIdx !== -1) list.items.splice(realIdx, 1);
           saveLists();
           renderLists();
-        });
-
-        const text = document.createElement("span");
-        text.className = "list-item-text" + (item.done ? " done" : "");
+          return;
+        }
         text.textContent = item.text;
-        text.contentEditable = "true";
-        text.spellcheck = false;
-        text.addEventListener("focus", () => {
-          // Select all on focus for easier editing
-          const range = document.createRange();
-          range.selectNodeContents(text);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-        });
-        text.addEventListener("blur", () => {
-          const newText = text.textContent.trim();
-          if (newText && newText !== item.text) {
-            item.text = newText;
-            saveLists();
-          } else if (!newText) {
-            // Empty text = delete
-            list.items.splice(idx, 1);
+      });
+      text.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); text.blur(); }
+        if (e.key === "Escape") { text.textContent = item.text; text.blur(); }
+      });
+
+      // Per-item ⋮ menu button
+      const menuBtn = document.createElement("button");
+      menuBtn.className = "item-menu-btn";
+      menuBtn.innerHTML = "&#8942;";
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showItemMenu(e.clientX, e.clientY, item, idx, list, isDone);
+      });
+
+      row.append(cb, text, menuBtn);
+      container.appendChild(row);
+    }
+
+    function showItemMenu(x, y, item, idx, list, isDone) {
+      closeListMenus();
+      const menu = document.createElement("div");
+      menu.className = "item-context-menu";
+
+      if (!isDone) {
+        // Get active items for move operations
+        const activeItems = list.items.filter(it => !it.done);
+        const activeIdx = activeItems.indexOf(item);
+
+        if (activeIdx > 0) {
+          const upBtn = document.createElement("button");
+          upBtn.textContent = "Move up";
+          upBtn.addEventListener("click", () => {
+            closeListMenus();
+            const realIndices = [];
+            list.items.forEach((it, ri) => { if (!it.done) realIndices.push(ri); });
+            const from = realIndices[activeIdx];
+            const to = realIndices[activeIdx - 1];
+            const [moved] = list.items.splice(from, 1);
+            list.items.splice(to, 0, moved);
             saveLists();
             renderLists();
-            return;
-          }
-          // Re-render to reset any whitespace
-          text.textContent = item.text;
-        });
-        text.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") { e.preventDefault(); text.blur(); }
-          if (e.key === "Escape") { text.textContent = item.text; text.blur(); }
-        });
+          });
+          menu.appendChild(upBtn);
+        }
 
-        const del = document.createElement("button");
-        del.className = "item-delete";
-        del.innerHTML = "&times;";
-        del.title = "Remove";
-        del.addEventListener("click", () => {
-          list.items.splice(idx, 1);
-          saveLists();
-          renderLists();
-        });
+        if (activeIdx < activeItems.length - 1) {
+          const downBtn = document.createElement("button");
+          downBtn.textContent = "Move down";
+          downBtn.addEventListener("click", () => {
+            closeListMenus();
+            const realIndices = [];
+            list.items.forEach((it, ri) => { if (!it.done) realIndices.push(ri); });
+            const from = realIndices[activeIdx];
+            const to = realIndices[activeIdx + 1];
+            const [moved] = list.items.splice(from, 1);
+            list.items.splice(to, 0, moved);
+            saveLists();
+            renderLists();
+          });
+          menu.appendChild(downBtn);
+        }
+      }
 
-        row.append(cb, text, del);
-        listsItems.appendChild(row);
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Edit";
+      editBtn.addEventListener("click", () => {
+        closeListMenus();
+        // Find and focus the text element
+        const rows = isDone ? listsCompleted.querySelectorAll(".list-item") : listsTasks.querySelectorAll(".list-item");
+        const row = rows[idx];
+        if (row) {
+          const textEl = row.querySelector(".list-item-text");
+          if (textEl) textEl.focus();
+        }
       });
+      menu.appendChild(editBtn);
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "danger";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", () => {
+        closeListMenus();
+        const realIdx = list.items.indexOf(item);
+        if (realIdx !== -1) list.items.splice(realIdx, 1);
+        saveLists();
+        renderLists();
+      });
+      menu.appendChild(delBtn);
+
+      document.body.appendChild(menu);
+      const menuRect = menu.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      menu.style.left = Math.min(x, vw - menuRect.width - 8) + "px";
+      menu.style.top = Math.min(y, vh - menuRect.height - 8) + "px";
+      activeItemMenu = menu;
     }
 
-    // Add item
-    listsAddBtn.addEventListener("click", () => {
-      if (listsData.length === 0) return;
+    function renderLists() {
+      closeListMenus();
+      populateSelect();
+
+      if (listsData.length === 0) {
+        listsTasks.innerHTML = '<div class="lists-empty">No lists yet. Click ⋮ to create one.</div>';
+        listsCompletedToggle.style.display = "none";
+        listsCompleted.innerHTML = "";
+        return;
+      }
+
+      if (currentListIdx >= listsData.length) currentListIdx = listsData.length - 1;
       const list = listsData[currentListIdx];
-      if (list.items.length >= 100) return;
-      const newItem = { id: genId(), text: "New item", done: false };
-      list.items.push(newItem);
-      saveLists();
-      renderLists();
-      // Focus the new item for editing
-      const lastText = listsItems.querySelector(".list-item:last-child .list-item-text");
-      if (lastText) {
-        lastText.focus();
+
+      const activeItems = list.items.filter(it => !it.done);
+      const doneItems = list.items.filter(it => it.done);
+
+      // Active tasks
+      listsTasks.innerHTML = "";
+      if (activeItems.length === 0 && doneItems.length === 0) {
+        listsTasks.innerHTML = '<div class="lists-empty">No items yet</div>';
+      } else {
+        activeItems.forEach((item, idx) => {
+          buildItem(item, idx, list, listsTasks, false);
+        });
       }
-    });
 
-    // List switcher dropdown
-    let activeListsDropdown = null;
-
-    function closeListsDropdowns() {
-      if (activeListsDropdown) {
-        activeListsDropdown.remove();
-        activeListsDropdown = null;
+      // Completed section
+      if (doneItems.length > 0) {
+        listsCompletedToggle.style.display = "flex";
+        listsCompletedCount.textContent = doneItems.length;
+        listsCompletedArrow.className = "lists-completed-arrow" + (completedOpen ? " open" : "");
+        listsCompleted.innerHTML = "";
+        if (completedOpen) {
+          listsCompleted.style.display = "";
+          doneItems.forEach((item, idx) => {
+            buildItem(item, idx, list, listsCompleted, true);
+          });
+        } else {
+          listsCompleted.style.display = "none";
+        }
+      } else {
+        listsCompletedToggle.style.display = "none";
+        listsCompleted.innerHTML = "";
       }
     }
 
-    listsHeaderLeft.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (activeListsDropdown) { closeListsDropdowns(); return; }
-      if (listsData.length <= 1) return;
-      const dd = document.createElement("div");
-      dd.className = "lists-dropdown";
-      listsData.forEach((list, i) => {
-        const btn = document.createElement("button");
-        btn.textContent = list.name;
-        if (i === currentListIdx) btn.className = "active";
-        btn.addEventListener("click", () => {
-          currentListIdx = i;
-          closeListsDropdowns();
-          renderLists();
-        });
-        dd.appendChild(btn);
-      });
-      const header = listsPanel.querySelector(".lists-header");
-      header.appendChild(dd);
-      activeListsDropdown = dd;
+    // Completed toggle
+    listsCompletedToggle.addEventListener("click", () => {
+      completedOpen = !completedOpen;
+      renderLists();
     });
 
-    // Three-dot menu
-    listsMenuBtn.addEventListener("click", (e) => {
+    // Add item via input
+    listsInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const text = listsInput.value.trim();
+        if (!text) return;
+        if (listsData.length === 0) return;
+        const list = listsData[currentListIdx];
+        if (list.items.length >= 100) return;
+        list.items.push({ id: genId(), text, done: false });
+        listsInput.value = "";
+        saveLists();
+        renderLists();
+      }
+    });
+
+    // Three-dot card menu
+    listsMenuBtn2.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (activeListsDropdown) { closeListsDropdowns(); return; }
+      if (activeListMenu) { closeListMenus(); return; }
       const menu = document.createElement("div");
       menu.className = "lists-context-menu";
 
@@ -1538,7 +1739,7 @@
         const newBtn = document.createElement("button");
         newBtn.textContent = "New list";
         newBtn.addEventListener("click", () => {
-          closeListsDropdowns();
+          closeListMenus();
           const name = prompt("List name:");
           if (!name || !name.trim()) return;
           listsData.push({ name: name.trim(), items: [] });
@@ -1550,11 +1751,10 @@
       }
 
       if (listsData.length > 0) {
-        // Rename
         const renameBtn = document.createElement("button");
         renameBtn.textContent = "Rename list";
         renameBtn.addEventListener("click", () => {
-          closeListsDropdowns();
+          closeListMenus();
           const name = prompt("Rename list:", listsData[currentListIdx].name);
           if (!name || !name.trim()) return;
           listsData[currentListIdx].name = name.trim();
@@ -1563,23 +1763,21 @@
         });
         menu.appendChild(renameBtn);
 
-        // Copy to clipboard
         const copyBtn = document.createElement("button");
         copyBtn.textContent = "Copy to clipboard";
         copyBtn.addEventListener("click", () => {
-          closeListsDropdowns();
+          closeListMenus();
           const list = listsData[currentListIdx];
           const text = list.items.map(i => `${i.done ? "[x]" : "[ ]"} ${i.text}`).join("\n");
           navigator.clipboard.writeText(list.name + "\n" + text).catch(() => {});
         });
         menu.appendChild(copyBtn);
 
-        // Delete
         const delBtn = document.createElement("button");
         delBtn.className = "danger";
         delBtn.textContent = "Delete list";
         delBtn.addEventListener("click", () => {
-          closeListsDropdowns();
+          closeListMenus();
           if (!confirm(`Delete list "${listsData[currentListIdx].name}"?`)) return;
           listsData.splice(currentListIdx, 1);
           if (currentListIdx >= listsData.length) currentListIdx = Math.max(0, listsData.length - 1);
@@ -1589,16 +1787,19 @@
         menu.appendChild(delBtn);
       }
 
-      const header = listsPanel.querySelector(".lists-header");
-      header.appendChild(menu);
-      activeListsDropdown = menu;
+      listsToolbar.appendChild(menu);
+      activeListMenu = menu;
     });
 
-    // Close dropdowns on outside click
+    // Close menus on outside click
     document.addEventListener("click", (e) => {
-      if (activeListsDropdown && !activeListsDropdown.contains(e.target) &&
-          !listsHeaderLeft.contains(e.target) && !listsMenuBtn.contains(e.target)) {
-        closeListsDropdowns();
+      if (activeListMenu && !activeListMenu.contains(e.target) && !listsMenuBtn2.contains(e.target)) {
+        activeListMenu.remove();
+        activeListMenu = null;
+      }
+      if (activeItemMenu && !activeItemMenu.contains(e.target)) {
+        activeItemMenu.remove();
+        activeItemMenu = null;
       }
     });
 
