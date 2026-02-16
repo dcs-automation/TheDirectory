@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Frequently Visited",
+    "links": [
+      {
+        "label": "Google",
+        "url": "https://www.google.com"
+      },
+      {
+        "label": "YouTube",
+        "url": "https://www.youtube.com"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com"
+      },
+      {
+        "label": "Reddit",
+        "url": "https://www.reddit.com"
+      },
+      {
+        "label": "Wikipedia",
+        "url": "https://en.wikipedia.org"
+      },
+      {
+        "label": "Twitter / X",
+        "url": "https://x.com"
+      },
+      {
+        "label": "https://buildpaste.net/",
+        "url": "https://buildpaste.net/"
+      }
+    ]
+  },
+  {
+    "name": "Productivity",
+    "links": [
+      {
+        "label": "Gmail",
+        "url": "https://mail.google.com"
+      },
+      {
+        "label": "Google Drive",
+        "url": "https://drive.google.com"
+      },
+      {
+        "label": "Calendar",
+        "url": "https://calendar.google.com"
+      },
+      {
+        "label": "Notion",
+        "url": "https://www.notion.so"
+      }
+    ]
+  },
+  {
+    "name": "Entertainment",
+    "links": [
+      {
+        "label": "Spotify",
+        "url": "https://open.spotify.com"
+      }
+    ]
+  }
+]

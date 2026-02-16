@@ -1,55 +1,104 @@
 #!/usr/bin/env python3
-"""Simple server for TheDirectory: serves static files + notes API."""
+"""Simple server for TheDirectory: serves static files + notes/bookmarks API."""
 
 import http.server
 import json
 import os
 
-NOTES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "notes.json")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+NOTES_FILE = os.path.join(BASE_DIR, "notes.json")
+BOOKMARKS_FILE = os.path.join(BASE_DIR, "bookmarks.json")
+
+DEFAULT_BOOKMARKS = [
+    {
+        "name": "Frequently Visited",
+        "links": [
+            {"label": "Google", "url": "https://www.google.com"},
+            {"label": "YouTube", "url": "https://www.youtube.com"},
+            {"label": "GitHub", "url": "https://github.com"},
+            {"label": "Reddit", "url": "https://www.reddit.com"},
+            {"label": "Wikipedia", "url": "https://en.wikipedia.org"},
+            {"label": "Twitter / X", "url": "https://x.com"},
+        ]
+    },
+    {
+        "name": "Productivity",
+        "links": [
+            {"label": "Gmail", "url": "https://mail.google.com"},
+            {"label": "Google Drive", "url": "https://drive.google.com"},
+            {"label": "Calendar", "url": "https://calendar.google.com"},
+            {"label": "Notion", "url": "https://www.notion.so"},
+        ]
+    },
+    {
+        "name": "Entertainment",
+        "links": [
+            {"label": "Netflix", "url": "https://www.netflix.com"},
+            {"label": "Spotify", "url": "https://open.spotify.com"},
+            {"label": "Twitch", "url": "https://www.twitch.tv"},
+        ]
+    }
+]
 
 
-def load_notes():
+def load_json(filepath, default):
     try:
-        with open(NOTES_FILE, "r") as f:
+        with open(filepath, "r") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        return {"content": ""}
+        return default
 
 
-def save_notes(data):
-    with open(NOTES_FILE, "w") as f:
-        json.dump(data, f)
+def save_json(filepath, data):
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=2)
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/notes":
-            notes = load_notes()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps(notes).encode())
+            self._json_response(load_json(NOTES_FILE, {"content": ""}))
+        elif self.path == "/api/bookmarks":
+            self._json_response(load_json(BOOKMARKS_FILE, DEFAULT_BOOKMARKS))
         else:
             super().do_GET()
 
     def do_PUT(self):
+        body = self._read_body()
+        if body is None:
+            return
         if self.path == "/api/notes":
-            length = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(length)
-            try:
-                data = json.loads(body)
-                save_notes({"content": data.get("content", "")})
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(b'{"ok":true}')
-            except json.JSONDecodeError:
-                self.send_response(400)
-                self.end_headers()
-                self.wfile.write(b'{"error":"invalid json"}')
+            save_json(NOTES_FILE, {"content": body.get("content", "")})
+            self._json_response({"ok": True})
+        elif self.path == "/api/bookmarks":
+            if not isinstance(body, list):
+                self._error_response(400, "expected array")
+                return
+            save_json(BOOKMARKS_FILE, body)
+            self._json_response({"ok": True})
         else:
-            self.send_response(404)
-            self.end_headers()
+            self._error_response(404, "not found")
+
+    def _read_body(self):
+        length = int(self.headers.get("Content-Length", 0))
+        raw = self.rfile.read(length)
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            self._error_response(400, "invalid json")
+            return None
+
+    def _json_response(self, data, status=200):
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode())
+
+    def _error_response(self, status, message):
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps({"error": message}).encode())
 
 
 if __name__ == "__main__":
