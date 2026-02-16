@@ -8,6 +8,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 NOTES_FILE = os.path.join(BASE_DIR, "notes.json")
 BOOKMARKS_FILE = os.path.join(BASE_DIR, "bookmarks.json")
+LISTS_FILE = os.path.join(BASE_DIR, "lists.json")
 
 DEFAULT_BOOKMARKS = [
     {
@@ -60,6 +61,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json_response(load_json(NOTES_FILE, {"content": ""}))
         elif self.path == "/api/bookmarks":
             self._json_response(load_json(BOOKMARKS_FILE, DEFAULT_BOOKMARKS))
+        elif self.path == "/api/lists":
+            self._json_response(load_json(LISTS_FILE, []))
         else:
             super().do_GET()
 
@@ -75,6 +78,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self._error_response(400, "expected array")
                 return
             save_json(BOOKMARKS_FILE, body)
+            self._json_response({"ok": True})
+        elif self.path == "/api/lists":
+            if not isinstance(body, list):
+                self._error_response(400, "expected array")
+                return
+            save_json(LISTS_FILE, body)
             self._json_response({"ok": True})
         else:
             self._error_response(404, "not found")

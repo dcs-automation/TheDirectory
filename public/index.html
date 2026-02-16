@@ -267,7 +267,35 @@
       z-index: 40;
     }
 
-    .side-box--left { left: 24px; height: 360px; }
+    .side-box--left {
+      left: 24px;
+      top: 48px;
+      bottom: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: none;
+      border: none;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .side-box--left::-webkit-scrollbar { width: 4px; }
+    .side-box--left::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .side-panel {
+      width: 280px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .side-panel--notes { height: 200px; }
+    .side-panel--lists { min-height: 280px; flex: 1; }
     .side-box--right { right: 24px; background: var(--bg); border: none; }
     .side-box--right .side-box-header { justify-content: center; border-bottom: none; }
 
@@ -278,7 +306,7 @@
       padding: 12px 14px;
     }
 
-    .side-box--left .side-box-header { border-bottom: 1px solid var(--border); }
+    .side-panel .side-box-header { border-bottom: 1px solid var(--border); }
 
     .side-box-header span {
       font-size: 0.8rem;
@@ -312,6 +340,207 @@
     }
 
     .notepad-textarea::placeholder { color: var(--text-muted); }
+
+    /* ── Lists widget ── */
+    .lists-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .lists-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      min-width: 0;
+    }
+
+    .lists-header-left:hover { color: var(--accent); }
+
+    .lists-name {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lists-header-left:hover .lists-name { color: var(--accent); }
+
+    .lists-arrow {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      transition: transform .2s;
+    }
+
+    .lists-menu-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    .lists-menu-btn:hover { background: var(--surface-hover); color: var(--text); }
+
+    .lists-dropdown,
+    .lists-context-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 60;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 0;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+
+    .lists-context-menu { left: auto; right: 0; }
+
+    .lists-dropdown button,
+    .lists-context-menu button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 14px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .lists-dropdown button:hover,
+    .lists-context-menu button:hover { background: var(--surface-hover); }
+    .lists-context-menu button.danger { color: var(--danger); }
+    .lists-context-menu button.danger:hover { background: rgba(213,91,91,.15); }
+
+    .lists-dropdown button.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .lists-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .lists-items::-webkit-scrollbar { width: 4px; }
+    .lists-items::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      cursor: default;
+      position: relative;
+    }
+
+    .list-item:hover { background: var(--surface-hover); }
+
+    .list-item input[type="checkbox"] {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .list-item input[type="checkbox"]:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .list-item input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .list-item-text {
+      flex: 1;
+      font-size: 0.83rem;
+      color: var(--text);
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: text;
+      padding: 2px 0;
+    }
+
+    .list-item-text.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .list-item-text:focus {
+      outline: none;
+      white-space: normal;
+      overflow: visible;
+    }
+
+    .list-item .item-delete {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0 2px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .list-item:hover .item-delete { display: block; }
+    .list-item .item-delete:hover { color: var(--danger); }
+
+    .list-item.drag-over-above { box-shadow: 0 -2px 0 0 var(--accent) inset; }
+    .list-item.drag-over-below { box-shadow: 0 2px 0 0 var(--accent) inset; }
+
+    .lists-add-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px 14px;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .lists-add-btn:hover { color: var(--text); background: var(--surface-hover); }
 
     /* ── Calendar ── */
     .calendar {
@@ -492,7 +721,14 @@
         background: var(--surface);
         border: 1px solid var(--border);
       }
-      .side-box--left.mobile-open { left: 16px; right: auto; height: 360px; }
+      .side-box--left.mobile-open {
+        left: 16px;
+        right: auto;
+        max-height: 70vh;
+        background: none;
+        border: none;
+        overflow-y: auto;
+      }
       .side-box--right.mobile-open { right: 16px; left: auto; background: var(--surface); }
     }
 
@@ -543,13 +779,29 @@
   <!-- Links -->
   <div class="main" id="main"></div>
 
-  <!-- Notepad (left) -->
+  <!-- Left sidebar: Notes + Lists -->
   <div class="side-box side-box--left">
-    <div class="side-box-header">
-      <span>Notes</span>
-      <span class="notepad-status" id="notepadStatus"></span>
+    <!-- Notes panel -->
+    <div class="side-panel side-panel--notes">
+      <div class="side-box-header">
+        <span>Notes</span>
+        <span class="notepad-status" id="notepadStatus"></span>
+      </div>
+      <textarea class="notepad-textarea" id="notepadText" placeholder="Write your notes here..."></textarea>
     </div>
-    <textarea class="notepad-textarea" id="notepadText" placeholder="Write your notes here..."></textarea>
+
+    <!-- Lists panel -->
+    <div class="side-panel side-panel--lists" id="listsPanel">
+      <div class="lists-header">
+        <div class="lists-header-left" id="listsHeaderLeft">
+          <span class="lists-name" id="listsName">Lists</span>
+          <span class="lists-arrow">&#9662;</span>
+        </div>
+        <button class="lists-menu-btn" id="listsMenuBtn" title="List options">&#8942;</button>
+      </div>
+      <div class="lists-items" id="listsItems"></div>
+      <button class="lists-add-btn" id="listsAddBtn">+ Add an item</button>
+    </div>
   </div>
 
   <!-- Calendar (right) -->
@@ -1072,6 +1324,289 @@
       if (activeContextMenu && !activeContextMenu.contains(e.target)) closeContextMenu();
     });
     document.addEventListener("scroll", closeContextMenu, true);
+
+    // ── Lists Widget ──
+    let listsData = [];
+    let currentListIdx = 0;
+    let listsSaveTimer = null;
+
+    const listsName = document.getElementById("listsName");
+    const listsItems = document.getElementById("listsItems");
+    const listsAddBtn = document.getElementById("listsAddBtn");
+    const listsHeaderLeft = document.getElementById("listsHeaderLeft");
+    const listsMenuBtn = document.getElementById("listsMenuBtn");
+    const listsPanel = document.getElementById("listsPanel");
+
+    function genId() {
+      return Math.random().toString(36).slice(2, 10);
+    }
+
+    function saveLists() {
+      clearTimeout(listsSaveTimer);
+      listsSaveTimer = setTimeout(() => {
+        fetch("/api/lists", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(listsData)
+        }).catch(() => {});
+      }, 400);
+    }
+
+    function renderLists() {
+      // Close any open dropdowns
+      closeListsDropdowns();
+
+      if (listsData.length === 0) {
+        listsName.textContent = "Lists";
+        listsItems.innerHTML = '<div style="padding: 14px; color: var(--text-muted); font-size: 0.82rem;">No lists yet. Click ⋮ to create one.</div>';
+        listsAddBtn.style.display = "none";
+        return;
+      }
+
+      if (currentListIdx >= listsData.length) currentListIdx = listsData.length - 1;
+      const list = listsData[currentListIdx];
+      listsName.textContent = list.name;
+      listsAddBtn.style.display = "";
+
+      listsItems.innerHTML = "";
+      list.items.forEach((item, idx) => {
+        const row = document.createElement("div");
+        row.className = "list-item";
+        row.draggable = true;
+
+        row.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", JSON.stringify({ type: "list-item", idx }));
+          row.style.opacity = "0.3";
+        });
+        row.addEventListener("dragend", () => {
+          row.style.opacity = "";
+          listsItems.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
+            el.classList.remove("drag-over-above", "drag-over-below");
+          });
+        });
+        row.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          listsItems.querySelectorAll(".drag-over-above, .drag-over-below").forEach(el => {
+            el.classList.remove("drag-over-above", "drag-over-below");
+          });
+          const rect = row.getBoundingClientRect();
+          const midY = rect.top + rect.height / 2;
+          if (e.clientY < midY) {
+            row.classList.add("drag-over-above");
+          } else {
+            row.classList.add("drag-over-below");
+          }
+        });
+        row.addEventListener("dragleave", () => {
+          row.classList.remove("drag-over-above", "drag-over-below");
+        });
+        row.addEventListener("drop", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          row.classList.remove("drag-over-above", "drag-over-below");
+          try {
+            const src = JSON.parse(e.dataTransfer.getData("text/plain"));
+            if (src.type !== "list-item") return;
+            const rect = row.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            const insertAfter = e.clientY >= midY;
+            const [moved] = list.items.splice(src.idx, 1);
+            let targetIdx = idx;
+            if (src.idx < idx) targetIdx--;
+            if (insertAfter) targetIdx++;
+            list.items.splice(targetIdx, 0, moved);
+            saveLists();
+            renderLists();
+          } catch {}
+        });
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = item.done;
+        cb.addEventListener("change", () => {
+          item.done = cb.checked;
+          saveLists();
+          renderLists();
+        });
+
+        const text = document.createElement("span");
+        text.className = "list-item-text" + (item.done ? " done" : "");
+        text.textContent = item.text;
+        text.contentEditable = "true";
+        text.spellcheck = false;
+        text.addEventListener("focus", () => {
+          // Select all on focus for easier editing
+          const range = document.createRange();
+          range.selectNodeContents(text);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        });
+        text.addEventListener("blur", () => {
+          const newText = text.textContent.trim();
+          if (newText && newText !== item.text) {
+            item.text = newText;
+            saveLists();
+          } else if (!newText) {
+            // Empty text = delete
+            list.items.splice(idx, 1);
+            saveLists();
+            renderLists();
+            return;
+          }
+          // Re-render to reset any whitespace
+          text.textContent = item.text;
+        });
+        text.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); text.blur(); }
+          if (e.key === "Escape") { text.textContent = item.text; text.blur(); }
+        });
+
+        const del = document.createElement("button");
+        del.className = "item-delete";
+        del.innerHTML = "&times;";
+        del.title = "Remove";
+        del.addEventListener("click", () => {
+          list.items.splice(idx, 1);
+          saveLists();
+          renderLists();
+        });
+
+        row.append(cb, text, del);
+        listsItems.appendChild(row);
+      });
+    }
+
+    // Add item
+    listsAddBtn.addEventListener("click", () => {
+      if (listsData.length === 0) return;
+      const list = listsData[currentListIdx];
+      if (list.items.length >= 100) return;
+      const newItem = { id: genId(), text: "New item", done: false };
+      list.items.push(newItem);
+      saveLists();
+      renderLists();
+      // Focus the new item for editing
+      const lastText = listsItems.querySelector(".list-item:last-child .list-item-text");
+      if (lastText) {
+        lastText.focus();
+      }
+    });
+
+    // List switcher dropdown
+    let activeListsDropdown = null;
+
+    function closeListsDropdowns() {
+      if (activeListsDropdown) {
+        activeListsDropdown.remove();
+        activeListsDropdown = null;
+      }
+    }
+
+    listsHeaderLeft.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (activeListsDropdown) { closeListsDropdowns(); return; }
+      if (listsData.length <= 1) return;
+      const dd = document.createElement("div");
+      dd.className = "lists-dropdown";
+      listsData.forEach((list, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = list.name;
+        if (i === currentListIdx) btn.className = "active";
+        btn.addEventListener("click", () => {
+          currentListIdx = i;
+          closeListsDropdowns();
+          renderLists();
+        });
+        dd.appendChild(btn);
+      });
+      const header = listsPanel.querySelector(".lists-header");
+      header.appendChild(dd);
+      activeListsDropdown = dd;
+    });
+
+    // Three-dot menu
+    listsMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (activeListsDropdown) { closeListsDropdowns(); return; }
+      const menu = document.createElement("div");
+      menu.className = "lists-context-menu";
+
+      // New list
+      if (listsData.length < 10) {
+        const newBtn = document.createElement("button");
+        newBtn.textContent = "New list";
+        newBtn.addEventListener("click", () => {
+          closeListsDropdowns();
+          const name = prompt("List name:");
+          if (!name || !name.trim()) return;
+          listsData.push({ name: name.trim(), items: [] });
+          currentListIdx = listsData.length - 1;
+          saveLists();
+          renderLists();
+        });
+        menu.appendChild(newBtn);
+      }
+
+      if (listsData.length > 0) {
+        // Rename
+        const renameBtn = document.createElement("button");
+        renameBtn.textContent = "Rename list";
+        renameBtn.addEventListener("click", () => {
+          closeListsDropdowns();
+          const name = prompt("Rename list:", listsData[currentListIdx].name);
+          if (!name || !name.trim()) return;
+          listsData[currentListIdx].name = name.trim();
+          saveLists();
+          renderLists();
+        });
+        menu.appendChild(renameBtn);
+
+        // Copy to clipboard
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "Copy to clipboard";
+        copyBtn.addEventListener("click", () => {
+          closeListsDropdowns();
+          const list = listsData[currentListIdx];
+          const text = list.items.map(i => `${i.done ? "[x]" : "[ ]"} ${i.text}`).join("\n");
+          navigator.clipboard.writeText(list.name + "\n" + text).catch(() => {});
+        });
+        menu.appendChild(copyBtn);
+
+        // Delete
+        const delBtn = document.createElement("button");
+        delBtn.className = "danger";
+        delBtn.textContent = "Delete list";
+        delBtn.addEventListener("click", () => {
+          closeListsDropdowns();
+          if (!confirm(`Delete list "${listsData[currentListIdx].name}"?`)) return;
+          listsData.splice(currentListIdx, 1);
+          if (currentListIdx >= listsData.length) currentListIdx = Math.max(0, listsData.length - 1);
+          saveLists();
+          renderLists();
+        });
+        menu.appendChild(delBtn);
+      }
+
+      const header = listsPanel.querySelector(".lists-header");
+      header.appendChild(menu);
+      activeListsDropdown = menu;
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener("click", (e) => {
+      if (activeListsDropdown && !activeListsDropdown.contains(e.target) &&
+          !listsHeaderLeft.contains(e.target) && !listsMenuBtn.contains(e.target)) {
+        closeListsDropdowns();
+      }
+    });
+
+    // Load lists from server
+    fetch("/api/lists")
+      .then(r => r.json())
+      .then(d => { listsData = Array.isArray(d) ? d : []; renderLists(); })
+      .catch(() => { renderLists(); });
 
   </script>
 </body>

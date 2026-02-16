@@ -9,3 +9,7 @@ id = "e013eb47dcb54682aaf5351166b6a78d"
 [[kv_namespaces]]
 binding = "BOOKMARKS"
 id = "f7529fc7048e4600a455cef69252e007"
+
+[[kv_namespaces]]
+binding = "LISTS"
+id = "REPLACE_WITH_ACTUAL_KV_NAMESPACE_ID"
