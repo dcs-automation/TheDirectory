@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Test List",
+    "items": [
+      {
+        "id": "abc123",
+        "text": "Buy groceries",
+        "done": false
+      },
+      {
+        "id": "def456",
+        "text": "Call dentist",
+        "done": true
+      }
+    ]
+  }
+]
