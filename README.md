@@ -2,6 +2,7 @@
 
 A personal new-tab homepage with bookmarks, notepad, lists, and calendar. Runs on Cloudflare Pages + Workers with KV storage.
 
+<img width="1846" height="1254" alt="image" src="https://github.com/user-attachments/assets/3e331a8c-3963-4377-b6b3-dd8ef770e780" />
 
 
 ## Local Development
